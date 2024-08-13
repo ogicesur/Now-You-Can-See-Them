@@ -22,7 +22,7 @@ public class NewBehaviourScript : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
-        GameObject player = PhotonNetwork.Instantiate("Player", new Vector3(1, 1, 0), Quaternion.identity, 0);
+        GameObject player = PhotonNetwork.Instantiate("Catherine Variant", new Vector3(1, 1, 0), Quaternion.identity, 0);
         if (player != null)
         {
             Debug.Log("Player instantiated successfully");
