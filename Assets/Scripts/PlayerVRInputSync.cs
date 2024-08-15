@@ -18,15 +18,33 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
     {
         if (photonView.IsMine)
         {
-            // Find the relevant VR components in the OVR rig for the local player
-            headTransform = transform.Find("OVRCameraRig/TrackingSpace/CenterEyeAnchor");
-            leftHandTransform = transform.Find("OVRCameraRig/TrackingSpace/LeftHandAnchor");
-            rightHandTransform = transform.Find("OVRCameraRig/TrackingSpace/RightHandAnchor");
-
-            if (headTransform == null || leftHandTransform == null || rightHandTransform == null)
+            // Only the local player (Ogi) should use OVRManager
+            if (PhotonNetwork.NickName == "Ogi")
             {
-                Debug.LogError("VR components (head/hand transforms) not found. Ensure the structure is correct.");
+                // Find the relevant VR components in the OVR rig for the local player
+                headTransform = transform.Find("OVRCameraRig/TrackingSpace/CenterEyeAnchor");
+                leftHandTransform = transform.Find("OVRCameraRig/TrackingSpace/LeftHandAnchor");
+                rightHandTransform = transform.Find("OVRCameraRig/TrackingSpace/RightHandAnchor");
+
+                if (headTransform == null || leftHandTransform == null || rightHandTransform == null)
+                {
+                    Debug.LogError("VR components (head/hand transforms) not found. Ensure the structure is correct.");
+                }
             }
+            else
+            {
+                Debug.LogError("Unexpected local player name. Expected 'Ogi'.");
+            }
+        }
+        else
+        {
+            // For the remote player (Hui), just initialize the positions
+            headPosition = Vector3.zero;
+            headRotation = Quaternion.identity;
+            leftHandPosition = Vector3.zero;
+            leftHandRotation = Quaternion.identity;
+            rightHandPosition = Vector3.zero;
+            rightHandRotation = Quaternion.identity;
         }
     }
 
@@ -34,7 +52,7 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
     {
         if (!photonView.IsMine)
         {
-            // Update remote VR components
+            // Update remote player (Hui) VR components
             if (headTransform != null && leftHandTransform != null && rightHandTransform != null)
             {
                 headTransform.position = headPosition;
@@ -49,19 +67,22 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if (stream.IsWriting)
+        if (stream.IsWriting && photonView.IsMine && PhotonNetwork.NickName == "Ogi")
         {
-            // Send local player data to the network
-            stream.SendNext(headTransform.position);
-            stream.SendNext(headTransform.rotation);
-            stream.SendNext(leftHandTransform.position);
-            stream.SendNext(leftHandTransform.rotation);
-            stream.SendNext(rightHandTransform.position);
-            stream.SendNext(rightHandTransform.rotation);
+            // Send local player (Ogi) data to the network
+            if (headTransform != null && leftHandTransform != null && rightHandTransform != null)
+            {
+                stream.SendNext(headTransform.position);
+                stream.SendNext(headTransform.rotation);
+                stream.SendNext(leftHandTransform.position);
+                stream.SendNext(leftHandTransform.rotation);
+                stream.SendNext(rightHandTransform.position);
+                stream.SendNext(rightHandTransform.rotation);
+            }
         }
-        else
+        else if (!stream.IsWriting && PhotonNetwork.NickName == "Hui")
         {
-            // Receive remote player data from the network
+            // Receive remote player (Hui) data from the network
             headPosition = (Vector3)stream.ReceiveNext();
             headRotation = (Quaternion)stream.ReceiveNext();
             leftHandPosition = (Vector3)stream.ReceiveNext();
@@ -70,5 +91,4 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
             rightHandRotation = (Quaternion)stream.ReceiveNext();
         }
     }
-
 }
