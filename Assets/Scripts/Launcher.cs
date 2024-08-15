@@ -62,5 +62,4 @@ public class Launcher : MonoBehaviourPunCallbacks
             Debug.LogError("Player instantiation failed");
         }
     }
-
 }

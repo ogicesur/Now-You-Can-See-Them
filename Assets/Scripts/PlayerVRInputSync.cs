@@ -18,7 +18,7 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
     {
         if (photonView.IsMine)
         {
-            // Find the relevant VR components in the OVR rig
+            // Find the relevant VR components in the OVR rig for the local player
             headTransform = transform.Find("OVRCameraRig/TrackingSpace/CenterEyeAnchor");
             leftHandTransform = transform.Find("OVRCameraRig/TrackingSpace/LeftHandAnchor");
             rightHandTransform = transform.Find("OVRCameraRig/TrackingSpace/RightHandAnchor");
@@ -28,6 +28,23 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
                 Debug.LogError("VR components (head/hand transforms) not found. Ensure the structure is correct.");
             }
         }
+        else
+        {
+            // Disable local components for the remote player to prevent them from being controlled by this instance
+            DisableLocalComponents();
+        }
+    }
+
+    void DisableLocalComponents()
+    {
+        // Disable scripts and components that should not be active for the remote player
+        OVRManager ovrManager = GetComponentInChildren<OVRManager>();
+        if (ovrManager != null)
+        {
+            ovrManager.enabled = false;
+        }
+
+        // Add other components that should be disabled for the remote player if necessary
     }
 
     void Update()
