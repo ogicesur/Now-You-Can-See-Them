@@ -16,12 +16,18 @@ public class Launcher : MonoBehaviourPunCallbacks
         base.OnConnectedToMaster();
         Debug.Log("Connected to Master");
 
-        PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions() { MaxPlayers = 4 }, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions() { MaxPlayers = 2 }, TypedLobby.Default);
     }
 
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
+
+        // Assign the player name based on the number of players in the room
+        string playerName = PhotonNetwork.CurrentRoom.PlayerCount == 1 ? "Ogi" : "Hui";
+        PhotonNetwork.NickName = playerName;
+
+        Debug.Log($"{playerName} has joined the room.");
 
         // Instantiate the player prefab
         GameObject player = PhotonNetwork.Instantiate("aaa", new Vector3(1, 1, 0), Quaternion.identity, 0);
@@ -32,8 +38,6 @@ public class Launcher : MonoBehaviourPunCallbacks
             PhotonView photonView = player.GetComponent<PhotonView>();
             if (photonView != null && photonView.IsMine)
             {
-                string playerName = PhotonNetwork.NickName;
-
                 if (playerName == "Ogi")
                 {
                     // Enable local player (Ogi) components (OVRManager, input handling, etc.)
@@ -63,7 +67,7 @@ public class Launcher : MonoBehaviourPunCallbacks
                     OVRManager ovrManager = player.GetComponentInChildren<OVRManager>();
                     if (ovrManager != null)
                     {
-                        ovrManager.enabled = false;
+                        ovrManager.enabled = true;
                     }
 
                     PlayerVRInputSync inputSync = player.GetComponent<PlayerVRInputSync>();
@@ -75,10 +79,6 @@ public class Launcher : MonoBehaviourPunCallbacks
                     {
                         Debug.LogError("PlayerVRInputSync script not found in the instantiated player prefab.");
                     }
-                }
-                else
-                {
-                    Debug.LogError("Unexpected player name. Expected 'Ogi' or 'Hui'.");
                 }
             }
             else if (photonView == null)
