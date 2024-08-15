@@ -28,18 +28,33 @@ public class Launcher : MonoBehaviourPunCallbacks
         {
             Debug.Log("Player instantiated successfully");
 
-            // If this player is the local player, enable VR controls and other local-only components
-            if (player.GetComponent<PhotonView>().IsMine)
+            PhotonView photonView = player.GetComponent<PhotonView>();
+            if (photonView != null && photonView.IsMine)
             {
                 // Enable local player components (OVRManager, input handling, etc.)
-                player.GetComponent<OVRManager>().enabled = true;
-                player.GetComponent<PlayerVRInputSync>().enabled = true;
+                OVRManager ovrManager = player.GetComponentInChildren<OVRManager>();
+                if (ovrManager != null)
+                {
+                    ovrManager.enabled = true;
+                }
+                else
+                {
+                    Debug.LogError("OVRManager not found in the instantiated player prefab.");
+                }
+
+                PlayerVRInputSync inputSync = player.GetComponent<PlayerVRInputSync>();
+                if (inputSync != null)
+                {
+                    inputSync.enabled = true;
+                }
+                else
+                {
+                    Debug.LogError("PlayerVRInputSync script not found in the instantiated player prefab.");
+                }
             }
-            else
+            else if (photonView == null)
             {
-                // Disable local-specific components for remote players
-                player.GetComponent<OVRManager>().enabled = false;
-                player.GetComponent<PlayerVRInputSync>().enabled = false;
+                Debug.LogError("PhotonView component missing on player prefab.");
             }
         }
         else
@@ -47,4 +62,5 @@ public class Launcher : MonoBehaviourPunCallbacks
             Debug.LogError("Player instantiation failed");
         }
     }
+
 }
