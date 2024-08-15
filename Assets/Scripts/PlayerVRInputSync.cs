@@ -7,6 +7,13 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
     private Transform leftHandTransform;
     private Transform rightHandTransform;
 
+    private Vector3 headPosition;
+    private Quaternion headRotation;
+    private Vector3 leftHandPosition;
+    private Quaternion leftHandRotation;
+    private Vector3 rightHandPosition;
+    private Quaternion rightHandRotation;
+
     void Start()
     {
         if (photonView.IsMine)
@@ -23,13 +30,20 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
         }
     }
 
-
     void Update()
     {
         if (!photonView.IsMine)
         {
-            // The update method for remote players
-            // This might be where you handle animation, audio, or other non-visual sync
+            // Update remote VR components
+            if (headTransform != null && leftHandTransform != null && rightHandTransform != null)
+            {
+                headTransform.position = headPosition;
+                headTransform.rotation = headRotation;
+                leftHandTransform.position = leftHandPosition;
+                leftHandTransform.rotation = leftHandRotation;
+                rightHandTransform.position = rightHandPosition;
+                rightHandTransform.rotation = rightHandRotation;
+            }
         }
     }
 
@@ -51,16 +65,12 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
         else
         {
             // Receive remote player data from the network
-            if (headTransform != null && leftHandTransform != null && rightHandTransform != null)
-            {
-                headTransform.position = (Vector3)stream.ReceiveNext();
-                headTransform.rotation = (Quaternion)stream.ReceiveNext();
-                leftHandTransform.position = (Vector3)stream.ReceiveNext();
-                leftHandTransform.rotation = (Quaternion)stream.ReceiveNext();
-                rightHandTransform.position = (Vector3)stream.ReceiveNext();
-                rightHandTransform.rotation = (Quaternion)stream.ReceiveNext();
-            }
+            headPosition = (Vector3)stream.ReceiveNext();
+            headRotation = (Quaternion)stream.ReceiveNext();
+            leftHandPosition = (Vector3)stream.ReceiveNext();
+            leftHandRotation = (Quaternion)stream.ReceiveNext();
+            rightHandPosition = (Vector3)stream.ReceiveNext();
+            rightHandRotation = (Quaternion)stream.ReceiveNext();
         }
     }
-
 }
