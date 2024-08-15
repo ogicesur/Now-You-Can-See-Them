@@ -52,15 +52,12 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
         if (stream.IsWriting)
         {
             // Send local player data to the network
-            if (headTransform != null && leftHandTransform != null && rightHandTransform != null)
-            {
-                stream.SendNext(headTransform.position);
-                stream.SendNext(headTransform.rotation);
-                stream.SendNext(leftHandTransform.position);
-                stream.SendNext(leftHandTransform.rotation);
-                stream.SendNext(rightHandTransform.position);
-                stream.SendNext(rightHandTransform.rotation);
-            }
+            stream.SendNext(headTransform.position);
+            stream.SendNext(headTransform.rotation);
+            stream.SendNext(leftHandTransform.position);
+            stream.SendNext(leftHandTransform.rotation);
+            stream.SendNext(rightHandTransform.position);
+            stream.SendNext(rightHandTransform.rotation);
         }
         else
         {
@@ -73,4 +70,5 @@ public class PlayerVRInputSync : MonoBehaviourPun, IPunObservable
             rightHandRotation = (Quaternion)stream.ReceiveNext();
         }
     }
+
 }

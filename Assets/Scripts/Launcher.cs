@@ -53,6 +53,7 @@ public class Launcher : MonoBehaviourPunCallbacks
                     Debug.LogError("PlayerVRInputSync script not found in the instantiated player prefab.");
                 }
             }
+
             else if (photonView == null)
             {
                 Debug.LogError("PhotonView component missing on player prefab.");
