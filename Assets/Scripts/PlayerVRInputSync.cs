@@ -2,7 +2,7 @@ using UnityEngine;
 using Photon.Pun;
 using System;
 
-public class PlayerVRInputSync : MonoBehaviourPunCallbacks
+public class PlayerVRInputSync : MonoBehaviourPunCallbacks, IPunObservable
 {
     private PhotonView photonView;
     private InputState inputState;
@@ -16,47 +16,69 @@ public class PlayerVRInputSync : MonoBehaviourPunCallbacks
         public float triggerRight;
         public bool buttonA;
         public bool buttonB;
-        // Add more input fields as needed
     }
 
     void Start()
     {
         photonView = GetComponent<PhotonView>();
+        if (photonView == null)
+        {
+            Debug.LogError("PhotonView component missing.");
+        }
     }
 
     void Update()
     {
         if (photonView.IsMine)
         {
-            // Capture input data
-            // Replace with your VR input system's methods
-            inputState.position = transform.position;
-            inputState.rotation = transform.rotation;
-            inputState.triggerLeft = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
-            inputState.triggerRight = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
-            inputState.buttonA = OVRInput.GetDown(OVRInput.Button.One);
-            inputState.buttonB = OVRInput.GetDown(OVRInput.Button.Two);
-            // Add more input capturing logic here
+            CaptureInput();
         }
         else
         {
-            // Apply input to remote player
-            // Replace with your character or object movement logic
-            transform.position = inputState.position;
-            transform.rotation = inputState.rotation;
-            // Handle trigger values and button presses for remote player
+            ApplyInput();
         }
     }
 
-    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    private void CaptureInput()
     {
-        if (stream.IsWriting && photonView.IsMine)
+        // Capture input data from VR system
+        inputState.position = transform.position;
+        inputState.rotation = transform.rotation;
+        inputState.triggerLeft = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
+        inputState.triggerRight = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
+        inputState.buttonA = OVRInput.Get(OVRInput.Button.One);
+        inputState.buttonB = OVRInput.Get(OVRInput.Button.Two);
+    }
+
+    private void ApplyInput()
+    {
+        // Apply input state to the player's transform for remote players
+        transform.position = inputState.position;
+        transform.rotation = inputState.rotation;
+    }
+
+    // Serialize and Deserialize data to synchronize across the network
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
         {
-            stream.SendNext(inputState);
+            // Send data to other players
+            stream.SendNext(inputState.position);
+            stream.SendNext(inputState.rotation);
+            stream.SendNext(inputState.triggerLeft);
+            stream.SendNext(inputState.triggerRight);
+            stream.SendNext(inputState.buttonA);
+            stream.SendNext(inputState.buttonB);
         }
         else
         {
-            inputState = (InputState)stream.ReceiveNext();
+            // Receive data from other players
+            inputState.position = (Vector3)stream.ReceiveNext();
+            inputState.rotation = (Quaternion)stream.ReceiveNext();
+            inputState.triggerLeft = (float)stream.ReceiveNext();
+            inputState.triggerRight = (float)stream.ReceiveNext();
+            inputState.buttonA = (bool)stream.ReceiveNext();
+            inputState.buttonB = (bool)stream.ReceiveNext();
         }
     }
 }
