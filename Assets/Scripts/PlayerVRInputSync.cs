@@ -4,7 +4,7 @@ using System;
 
 public class PlayerVRInputSync : MonoBehaviourPunCallbacks, IPunObservable
 {
-    private PhotonView photonView;
+    public  new PhotonView photonView;
     private InputState inputState;
 
     [Serializable]
