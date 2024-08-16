@@ -9,7 +9,7 @@ public class ObstacleSpawner : MonoBehaviour
                                       // public Vector2 spawnAreaMax;      // 生成区域的最大边界
     public Vector3 moveDirection1 = Vector3.forward; // 障碍物移动方向
     public Vector3 moveDirection2 = Vector3.back;
-    public float moveSpeed = 5f; // 障碍物移动速度
+    public float moveSpeed = 20f; // 障碍物移动速度
 
 
     void Start()
@@ -23,14 +23,14 @@ public class ObstacleSpawner : MonoBehaviour
         while (true)
         {
             // 随机选择生成时间
-            float randomDelay = Random.Range(0.5f * spawnInterval, 1.5f * spawnInterval);
+            float randomDelay = Random.Range(1f * spawnInterval, 2f * spawnInterval);
             yield return new WaitForSeconds(randomDelay);
 
             // 生成障碍物
             Vector3 spawnPosition = new Vector3(
-            Random.Range(-10, 10),
-            2f,
-            Random.Range(-10, 10)
+            Random.Range(-3, 3),
+            1f,
+            Random.Range(-3,3)
         );
 
             // 实例化第一个障碍物并初始化其移动方向
