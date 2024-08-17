@@ -30,7 +30,7 @@ public class ObstacleSpawner : MonoBehaviour
             Vector3 spawnPosition = new Vector3(
             Random.Range(-3, 3),
             -9f,
-            Random.Range(10,20)
+            23f
         );
 
             // 实例化第一个障碍物并初始化其移动方向
