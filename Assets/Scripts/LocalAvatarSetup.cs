@@ -1,10 +1,11 @@
-using System.Collections;
+﻿using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class LocalAvatarSetup : MonoBehaviour
 {
     GameObject localAvatar = null;
+    private AudioSource audioSource;
     void Start()
     {
         StartCoroutine(SetupAvatarWhenReady());
@@ -17,8 +18,17 @@ public class LocalAvatarSetup : MonoBehaviour
 
     public IEnumerator SetupAvatarWhenReady()
     {
-        
-        
+
+        audioSource = GetComponent<AudioSource>();
+
+         if (audioSource == null)
+         {
+         }
+         else
+         {
+             audioSource.Play(); // This should play the audio when the game starts
+             Debug.Log("Test sound played at start.");
+         }
         // Wait until the local avatar is instantiated
         while (localAvatar == null)
         {
@@ -97,8 +107,38 @@ public class LocalAvatarSetup : MonoBehaviour
                 SetupHandObjects(localAvatar);
             }
         }
+
+        
     }
+    public void OnCollisionEnter(Collision collision)
+    {
+
+        if (collision.gameObject.CompareTag("Obstacles"))
+        {
+            Debug.Log("与障碍物发生碰撞！");
 
 
+            // Check if the AudioSource and AudioClip are correctly assigned
+            if (audioSource != null)
+            {
+                if (audioSource.clip != null)
+                {
+                    Debug.Log("Playing collision sound.");
+                    audioSource.PlayOneShot(audioSource.clip);
+                }
+                else
+                {
+                    Debug.LogError("AudioClip is not assigned to the AudioSource.");
+                }
+            }
+            else
+            {
+                Debug.LogError("AudioSource component is missing or not assigned.");
+            }
+
+            Destroy(collision.gameObject);
+        }
+
+    }
 
 }
