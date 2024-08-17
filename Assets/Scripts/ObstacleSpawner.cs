@@ -29,7 +29,7 @@ public class ObstacleSpawner : MonoBehaviour
             // 生成障碍物
             Vector3 spawnPosition = new Vector3(
             Random.Range(-3, 3),
-            0f,
+            -9f,
             Random.Range(10,20)
         );
 
