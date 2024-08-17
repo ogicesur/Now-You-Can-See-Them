@@ -20,7 +20,7 @@ public class AvatarPositionManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("One or both avatars are missing.");
+            Debug.Log("One or both avatars are missing.");
         }
     }
 

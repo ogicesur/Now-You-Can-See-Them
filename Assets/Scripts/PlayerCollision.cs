@@ -5,24 +5,13 @@ using TMPro;
 
 public class PlayerCollision : MonoBehaviour
 {
-    // Reference to the AudioSource component
-    private AudioSource audioSource;
+    [SerializeField] private AudioClip collisionClip; // Expose AudioClip in the Inspector
     private TextMeshProUGUI scoreText;
     private int score = 0;
 
-
     private void Start()
     {
-        audioSource = GetComponent<AudioSource>();
-
-        if (audioSource == null)
-        {
-        }
-        else
-        {
-            audioSource.Play(); // This should play the audio when the game starts
-            Debug.Log("Test sound played at start.");
-        }
+        // Initialize the scoreText reference
         GameObject scoreTextObject = GameObject.Find("ScoreText1");
         if (scoreTextObject != null)
         {
@@ -31,57 +20,53 @@ public class PlayerCollision : MonoBehaviour
 
         if (scoreText == null)
         {
-            Debug.LogError("ScoreText is not assigned. Please assign it in the inspector.");
+            Debug.LogWarning("ScoreText is not assigned. Please assign it in the inspector.");
         }
 
-        // 更新初始分数显示
+        // Update initial score display
         UpdateScoreText();
     }
-
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Obstacles"))
         {
-            Debug.Log("与障碍物发生碰撞！");
+            Debug.Log("Collision with obstacle!");
 
+            // Increase score and update text
             score += 1;
             UpdateScoreText();
 
-
-            // Check if the AudioSource and AudioClip are correctly assigned
-            if (audioSource != null)
+            // Play the collision sound if an AudioClip is assigned
+            if (collisionClip != null)
             {
-                if (audioSource.clip != null)
-                {
-                    Debug.Log("Playing collision sound.");
-                    audioSource.PlayOneShot(audioSource.clip);
-                }
-                else
-                {
-                    Debug.LogError("AudioClip is not assigned to the AudioSource.");
-                }
+                AudioSource.PlayClipAtPoint(collisionClip, transform.position);
             }
             else
             {
-                Debug.LogError("AudioSource component is missing or not assigned.");
+                Debug.LogWarning("No AudioClip assigned for collision sound.");
             }
 
+            // Destroy the obstacle
             Destroy(collision.gameObject);
 
+            // Trigger Arduino vibration if the controller instance exists
             if (ArduinoController.Instance != null)
             {
                 ArduinoController.Instance.TriggerVibration();
             }
             else
             {
-                Debug.LogError("ArduinoController instance not found.");
+                Debug.LogWarning("ArduinoController instance not found.");
             }
         }
     }
 
     private void UpdateScoreText()
     {
-        scoreText.text = score.ToString();
+        if (scoreText != null)
+        {
+            scoreText.text = score.ToString();
+        }
     }
 }
