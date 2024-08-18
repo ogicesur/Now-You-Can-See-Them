@@ -32,6 +32,16 @@ public class PlayerCollision : MonoBehaviour
         if (collision.gameObject.CompareTag("Obstacles"))
         {
             Debug.Log("Collision with obstacle!");
+            // Debug the state of WaitingText
+            GameObject waitingText = GameObject.Find("WaittingText");
+            if (waitingText != null)
+            {
+                Debug.Log($"WaitingText is active: {waitingText.activeSelf}");
+            }
+            else
+            {
+                Debug.Log("WaitingText object not found.");
+            }
 
             // Increase score and update text
             score += 1;

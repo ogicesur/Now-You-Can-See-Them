@@ -1,11 +1,13 @@
 ﻿using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class LocalAvatarSetup : MonoBehaviour
 {
     GameObject localAvatar = null;
-    [SerializeField] private AudioClip collisionClip; // Expose AudioClip in Inspector
+    [SerializeField] private AudioClip collisionClip;
+    [SerializeField] private ObstacleSpawner obstacleSpawner;
+
+    private static int localAvatarCount = 0;
 
     void Start()
     {
@@ -22,10 +24,18 @@ public class LocalAvatarSetup : MonoBehaviour
             {
                 Debug.Log("Local Avatar is found");
 
-                if (localAvatar.GetComponent<PlayerCollision>() == null)
+                localAvatarCount++;
+
+                if (localAvatarCount == 2)
                 {
-                   // localAvatar.AddComponent<PlayerCollision>();
-                    Debug.Log("Script is added");
+                    if (obstacleSpawner != null)
+                    {
+                        obstacleSpawner.StartSpawning();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("ObstacleSpawner reference is not set.");
+                    }
                 }
             }
 
@@ -45,42 +55,28 @@ public class LocalAvatarSetup : MonoBehaviour
         {
             Debug.Log("LeftHand is found");
             AddBoxColliderAndRigidbodyToHand(leftHand.gameObject, new Vector3(0.25f, 0.25f, 0.25f), new Vector3(0.09f, 0.02f, 0.0f));
-            leftHand.AddComponent<PlayerCollision>();
+            leftHand.gameObject.AddComponent<PlayerCollision>();
         }
 
         if (rightHand != null)
         {
             Debug.Log("RightHand is found");
             AddBoxColliderAndRigidbodyToHand(rightHand.gameObject, new Vector3(0.25f, 0.25f, 0.25f), new Vector3(-0.17f, -0.05f, 0.02f));
-            rightHand.AddComponent<PlayerCollision>();
+            rightHand.gameObject.AddComponent<PlayerCollision>();
         }
     }
 
-    // public void AddBoxColliderAndRigidbodyToHand(GameObject hand)
-    //{
-    //hand.AddComponent<BoxCollider>();
-    //hand.AddComponent<PlayerCollision>();
-
-
-    //Debug.Log("Added Collider");
-
-    // Add BoxCollider if not present
     public void AddBoxColliderAndRigidbodyToHand(GameObject hand, Vector3 colliderSize, Vector3 colliderPosition)
     {
-        // Add BoxCollider if not present
         BoxCollider boxCollider = hand.GetComponent<BoxCollider>();
         if (boxCollider == null)
         {
             boxCollider = hand.AddComponent<BoxCollider>();
         }
 
-        // Adjust the size of the BoxCollider
-        boxCollider.size = colliderSize; // Set the desired size here
+        boxCollider.size = colliderSize;
+        boxCollider.center = colliderPosition;
 
-        // Adjust the position of the BoxCollider
-        boxCollider.center = colliderPosition; // Set the desired position here
-
-        // Add Rigidbody if not present
         Rigidbody rb = hand.GetComponent<Rigidbody>();
         if (rb == null)
         {

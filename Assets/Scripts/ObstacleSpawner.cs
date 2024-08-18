@@ -3,45 +3,59 @@ using UnityEngine;
 
 public class ObstacleSpawner : MonoBehaviour
 {
-    public GameObject obstaclePrefab; // 预制体
-    public float spawnInterval = 1f;  // 障碍物生成的时间间隔
-                                      //public Vector2 spawnAreaMin;      // 生成区域的最小边界
-                                      // public Vector2 spawnAreaMax;      // 生成区域的最大边界
-    public Vector3 moveDirection1 = Vector3.forward; // 障碍物移动方向
-    public Vector3 moveDirection2 = Vector3.back;
-    public float moveSpeed = 15f; // 障碍物移动速度
+    public GameObject obstaclePrefab; // The obstacle prefab to spawn
+    public float spawnInterval = 1f;  // The interval between obstacle spawns
 
+    public Vector3 moveDirection1 = Vector3.forward; // First obstacle move direction
+    public Vector3 moveDirection2 = Vector3.back;    // Second obstacle move direction
+    public float moveSpeed = 15f; // Speed at which the obstacles move
 
-    void Start()
+    private Coroutine spawnCoroutine; // Reference to the spawn coroutine
+
+    // Public method to start spawning obstacles
+    public void StartSpawning()
     {
-        // 开始重复调用 SpawnObstacle 方法
-        StartCoroutine(SpawnObstacles());
+        if (spawnCoroutine == null) // Ensure only one coroutine runs at a time
+        {
+            spawnCoroutine = StartCoroutine(SpawnObstacles());
+            Debug.Log("Obstacle spawning started.");
+        }
     }
 
+    // Public method to stop spawning obstacles (if needed)
+    public void StopSpawning()
+    {
+        if (spawnCoroutine != null)
+        {
+            StopCoroutine(spawnCoroutine);
+            spawnCoroutine = null;
+            Debug.Log("Obstacle spawning stopped.");
+        }
+    }
+
+    // Coroutine to spawn obstacles at regular intervals
     IEnumerator SpawnObstacles()
     {
         while (true)
         {
-            // 随机选择生成时间
+            // Random delay between spawns
             float randomDelay = Random.Range(0.5f * spawnInterval, 1f * spawnInterval);
             yield return new WaitForSeconds(randomDelay);
 
-            // 生成障碍物
+            // Define spawn position
             Vector3 spawnPosition = new Vector3(
-            Random.Range(2.5f, 1.8f),
-            Random.Range(-10f,-9f),
-            23f
-        );
+                Random.Range(1.8f, 2.5f), // Adjust the X range as needed
+                Random.Range(-10f, -9f),  // Adjust the Y range as needed
+                23f                       // Fixed Z position
+            );
 
-            // 实例化第一个障碍物并初始化其移动方向
+            // Instantiate the first obstacle and set its movement direction
             GameObject obstacle1 = Instantiate(obstaclePrefab, spawnPosition, Quaternion.identity);
             obstacle1.AddComponent<ObstacleMovement>().Initialize(moveDirection1, moveSpeed);
 
-            // 实例化第二个障碍物并初始化其移动方向
+            // Instantiate the second obstacle and set its movement direction
             GameObject obstacle2 = Instantiate(obstaclePrefab, spawnPosition, Quaternion.identity);
             obstacle2.AddComponent<ObstacleMovement>().Initialize(moveDirection2, moveSpeed);
         }
     }
-
-
 }
