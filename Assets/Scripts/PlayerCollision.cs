@@ -1,33 +1,72 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PlayerCollision : MonoBehaviour
 {
-    private ArduinoController arduinoController;
+    [SerializeField] private AudioClip collisionClip; // Expose AudioClip in the Inspector
+    private TextMeshProUGUI scoreText;
+    private static int score = 0;
 
     private void Start()
     {
-        if (ArduinoController.Instance == null)
+        // Initialize the scoreText reference
+        GameObject scoreTextObject = GameObject.Find("ScoreText1");
+        if (scoreTextObject != null)
         {
-            Debug.LogError("ArduinoController instance not found. Please ensure it is attached to a game object in the scene.");
+            scoreText = scoreTextObject.GetComponent<TextMeshProUGUI>();
         }
+
+        if (scoreText == null)
+        {
+            Debug.LogWarning("ScoreText is not assigned. Please assign it in the inspector.");
+        }
+
+        // Update initial score display
+        UpdateScoreText();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Obstacle"))
+        if (collision.gameObject.CompareTag("Obstacles"))
         {
-            Debug.Log("与障碍物发生碰撞！");
+            Debug.Log("Collision with obstacle!");
+
+            // Increase score and update text
+            score += 1;
+            UpdateScoreText();
+
+            // Play the collision sound if an AudioClip is assigned
+            if (collisionClip != null)
+            {
+                AudioSource.PlayClipAtPoint(collisionClip, transform.position);
+            }
+            else
+            {
+                Debug.LogWarning("No AudioClip assigned for collision sound.");
+            }
+
+            // Destroy the obstacle
+            Destroy(collision.gameObject);
+
+            // Trigger Arduino vibration if the controller instance exists
             if (ArduinoController.Instance != null)
             {
                 ArduinoController.Instance.TriggerVibration();
             }
             else
             {
-                Debug.LogError("ArduinoController instance not found");
+                Debug.LogWarning("ArduinoController instance not found.");
             }
         }
     }
 
+    private void UpdateScoreText()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = score.ToString();
+        }
+    }
 }
