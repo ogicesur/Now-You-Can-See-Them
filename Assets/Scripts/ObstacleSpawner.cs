@@ -17,19 +17,8 @@ public class ObstacleSpawner : MonoBehaviour
     {
         if (spawnCoroutine == null) // Ensure only one coroutine runs at a time
         {
+            Debug.Log("Starting obstacle spawning.");
             spawnCoroutine = StartCoroutine(SpawnObstacles());
-            Debug.Log("Obstacle spawning started.");
-        }
-    }
-
-    // Public method to stop spawning obstacles (if needed)
-    public void StopSpawning()
-    {
-        if (spawnCoroutine != null)
-        {
-            StopCoroutine(spawnCoroutine);
-            spawnCoroutine = null;
-            Debug.Log("Obstacle spawning stopped.");
         }
     }
 
@@ -38,6 +27,8 @@ public class ObstacleSpawner : MonoBehaviour
     {
         while (true)
         {
+            Debug.Log("Spawning an obstacle.");
+
             // Random delay between spawns
             float randomDelay = Random.Range(0.5f * spawnInterval, 1f * spawnInterval);
             yield return new WaitForSeconds(randomDelay);

@@ -25,9 +25,12 @@ public class LocalAvatarSetup : MonoBehaviour
                 Debug.Log("Local Avatar is found");
 
                 localAvatarCount++;
+                Debug.Log("Local Avatar Count: " + localAvatarCount);
 
                 if (localAvatarCount == 2)
                 {
+                    Debug.Log("Two players have joined. Starting obstacle spawning.");
+
                     if (obstacleSpawner != null)
                     {
                         obstacleSpawner.StartSpawning();
