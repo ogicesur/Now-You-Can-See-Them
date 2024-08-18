@@ -33,7 +33,7 @@ public class PlayerCollision : MonoBehaviour
         {
             Debug.Log("Collision with obstacle!");
             // Debug the state of WaitingText
-            GameObject waitingText = GameObject.Find("WaittingText");
+            GameObject waitingText = GameObject.Find("WaitingText");
             if (waitingText != null)
             {
                 Debug.Log($"WaitingText is active: {waitingText.activeSelf}");

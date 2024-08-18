@@ -31,6 +31,7 @@ public class LocalAvatarSetup : MonoBehaviour
                 {
                     Debug.Log("Two players have joined. Starting obstacle spawning.");
 
+                    // Trigger obstacle spawning directly here
                     if (obstacleSpawner != null)
                     {
                         obstacleSpawner.StartSpawning();
