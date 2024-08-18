@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
 public class ObstacleMovement : MonoBehaviour
 {
     private Vector3 moveDirection;
@@ -17,14 +18,44 @@ public class ObstacleMovement : MonoBehaviour
 
 
     // Update is called once per frame
+    
+}*/
+
+
+using System;
+using UnityEngine;
+
+public class ObstacleMovement : MonoBehaviour
+{
+    private Vector3 moveDirection;
+    private float moveSpeed;
+
+    // Delegate for handling the destruction of obstacles
+    public event Action OnDestroyCallback;
+
+    public void Initialize(Vector3 direction, float speed)
+    {
+        moveDirection = direction;
+        moveSpeed = speed;
+    }
+
+    // Update is called once per frame
     void Update()
     {
         transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
-        // 可以根据需要添加逻辑来销毁障碍物，例如超出一定范围后销毁
-        /* if (transform.position.x < -10 || transform.position.x > 10 ||
-             transform.position.z < -10 || transform.position.z > 10)
-         {
-             Destroy(gameObject);
-         }*/
+
+    }
+
+    private void DestroyObstacle()
+    {
+        // Trigger the OnDestroyCallback event before destroying the object
+        OnDestroyCallback?.Invoke();
+        Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        // Ensure the callback is called if the object is destroyed through other means
+        OnDestroyCallback?.Invoke();
     }
 }
